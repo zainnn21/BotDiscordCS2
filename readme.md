@@ -6,6 +6,16 @@
 
 A powerful and easy-to-use Discord bot for checking Counter-Strike 2 player statistics directly from your server. Built with Node.js and Discord.js, it integrates with the Steam Web API to provide accurate, up-to-date lifetime stats for any public Steam profile.
 
+---
+
+### 🎉 Invite Me!
+
+Ready to analyze your stats? Add this bot to your Discord server!
+
+[![Add to Discord](https://img.shields.io/badge/Add%20to%20Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/oauth2/authorize?client_id=1423470446720061582&permissions=83968&integration_type=0&scope=bot+applications.commands)
+
+---
+
 ## 📸 Screenshot
 
 ![Bot Screenshot](https://imgur.com/7Hr9tU8.png)
