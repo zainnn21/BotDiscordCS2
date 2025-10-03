@@ -46,6 +46,24 @@ const botReady = async (readyClient: Client) => {
   } catch (e) {
     console.error("Failed to register commands: ", e);
   }
+
+  //Command /check
+  const checkCommand = new SlashCommandBuilder()
+    .setName("check")
+    .setDescription("Analyze CS2 player stats and bans")
+    .addStringOption((option) =>
+      option
+        .setName("steamid")
+        .setDescription("URL Steam Profile, custom name, steamID64")
+        .setRequired(true)
+    );
+  commands.push(checkCommand.toJSON());
+  try {
+    console.log("Registering command");
+    await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands });
+  } catch (e) {
+    console.error("Failed to register commands: ", e);
+  }
 };
 
 export default botReady;

@@ -4,6 +4,7 @@ import { Client, Events, GatewayIntentBits, Interaction } from "discord.js";
 import botReady from "./events/botReady";
 import cs2StatsHandler from "./handler/cs2stats";
 import weaponsHandler from "./handler/weapons";
+import check from "./handler/check";
 
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 
@@ -24,13 +25,16 @@ client.once(Events.ClientReady, async (readyClient) => {
 client.on(Events.InteractionCreate, async (interaction: Interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
-  //HANDLER FOR cs2stats
+  //HANDLER
   if (interaction.commandName === "cs2stats") {
     await interaction.deferReply();
     await cs2StatsHandler(interaction);
   } else if (interaction.commandName === "weapons") {
     await interaction.deferReply();
     await weaponsHandler(interaction);
+  } else if (interaction.commandName === "check") {
+    await interaction.deferReply();
+    await check(interaction);
   }
 });
 

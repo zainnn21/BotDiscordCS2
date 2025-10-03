@@ -15,7 +15,18 @@ export interface PlayerSummary {
   personaname: string;
   profileurl: string;
   avatarfull: string;
+  timecreated: number;
 }
+
+export interface PlayerBans {
+  CommunityBanned: boolean;
+  VACBanned: boolean;
+  NumberOfVACBans: number;
+  DaysSinceLastBan: number;
+  NumberOfGameBans: number;
+  EconomyBan: string;
+}
+
 export const getSteamID64 = async (input: string) => {
   if (!input) {
     throw new Error("Invalid input");
@@ -71,4 +82,14 @@ export const getPlayerStats = async (
     stats[stat.name] = stat.value;
   });
   return stats;
+};
+
+export const getPlayerBans = async (steamID64: string): Promise<PlayerBans> => {
+  const response = await axios.get(
+    `https://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key=${STEAM_API_KEY}&steamids=${steamID64}`
+  );
+  if (response.data.players.length === 0) {
+    throw new Error("Player not found");
+  }
+  return response.data.players[0];
 };
