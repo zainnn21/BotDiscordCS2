@@ -1,6 +1,14 @@
-export const processWeaponStats = (stats) => {
-  const weaponData = [];
-  const excludedKeys = [
+import { PlayerStats } from "../events/steamAPI";
+
+interface WeaponStat {
+  name: string;
+  kills: number;
+  accuracy: string;
+}
+
+export const processWeaponStats = (stats: PlayerStats): WeaponStat[] => {
+  const weaponData: WeaponStat[] = [];
+  const excludedKeys: string[] = [
     "knife_fight",
     "hegrenade",
     "molotov",
@@ -17,12 +25,12 @@ export const processWeaponStats = (stats) => {
       key.startsWith("total_kills_") &&
       !excludedKeys.some((ex) => key.includes(ex))
     ) {
-      const weaponName = key.substring("total_kills_".length);
-      const kills = stats[key] || 0;
-      const shots = stats[`total_shots_${weaponName}`] || 1;
-      const hits = stats[`total_hits_${weaponName}`] || 0;
+      const weaponName: string = key.substring("total_kills_".length);
+      const kills: number = stats[key] || 0;
+      const shots: number = stats[`total_shots_${weaponName}`] || 1;
+      const hits: number = stats[`total_hits_${weaponName}`] || 0;
 
-      const accuracy = ((hits / shots) * 100).toFixed(2);
+      const accuracy: string = ((hits / shots) * 100).toFixed(2);
 
       weaponData.push({
         name: weaponName.toUpperCase(),
