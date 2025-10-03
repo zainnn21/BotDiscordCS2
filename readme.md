@@ -8,7 +8,7 @@ A powerful and easy-to-use Discord bot for checking Counter-Strike 2 player stat
 
 ## 📸 Screenshot
 
-![Bot Screenshot](https://imgur.com/a/8rxe3qN.png)
+![Bot Screenshot](https://imgur.com/7Hr9tU8.png)
 ![Bot Screenshot](https://imgur.com/2HLPPKV.png)
 
 ## ✨ Features
