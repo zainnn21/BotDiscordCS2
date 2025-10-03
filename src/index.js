@@ -10,6 +10,7 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import axios from "axios";
+import { processWeaponStats } from "./utils/processWeaponStats.js";
 
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
@@ -80,9 +81,11 @@ const getPlayerStats = async (steamID64) => {
 client.once(Events.ClientReady, async () => {
   console.log("Bot Login as", client.user.tag);
 
-  //Command Discord
   const rest = new REST({ version: "10" }).setToken(DISCORD_TOKEN);
-  const command = new SlashCommandBuilder()
+  const commands = [];
+
+  //Command /cs2stats
+  const statsCommand = new SlashCommandBuilder()
     .setName("cs2stats")
     .setDescription("Get CS2 player stats")
     .addStringOption((option) =>
@@ -91,11 +94,22 @@ client.once(Events.ClientReady, async () => {
         .setDescription("URL Steam Profile, custom name, steamID64")
         .setRequired(true)
     );
+  commands.push(statsCommand.toJSON());
+
+  //Command /weapons
+  const weaponsCommand = new SlashCommandBuilder()
+    .setName("weapons")
+    .setDescription("Get CS2 favorite weapons")
+    .addStringOption((option) =>
+      option
+        .setName("steamid")
+        .setDescription("URL Steam Profile, custom name, steamID64")
+        .setRequired(true)
+    );
+  commands.push(weaponsCommand.toJSON());
   try {
     console.log("Registering command");
-    await rest.put(Routes.applicationCommands(CLIENT_ID), {
-      body: [command.toJSON()],
-    });
+    await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands });
   } catch (e) {
     console.error("Failed to register commands: ", e);
   }
@@ -105,6 +119,7 @@ client.once(Events.ClientReady, async () => {
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
+  //HANDLER FOR cs2stats
   if (interaction.commandName === "cs2stats") {
     await interaction.deferReply();
     const userInput = interaction.options.getString("steamid");
@@ -119,6 +134,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
       ]);
 
       //count stats
+      const playTime = stats.total_time_played || 0;
+      const hoursPlayed = (playTime / 3600).toFixed(2);
+      const knifeKills = stats.total_kills_knife || 0;
       const totalKills = stats.total_kills || 0;
       const totalDeaths = stats.total_deaths || 1;
       const kdRatio = (totalKills / totalDeaths).toFixed(2);
@@ -135,9 +153,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
         .setURL(summary.profileurl)
         .setThumbnail(summary.avatarfull)
         .addFields(
+          { name: "Playtime", value: `${hoursPlayed} hours`, inline: true },
           { name: "Total Kills", value: totalKills.toString(), inline: true },
           { name: "Total Deaths", value: totalDeaths.toString(), inline: true },
           { name: "K/D Ratio", value: kdRatio.toString(), inline: true },
+          { name: "Knife Kills", value: knifeKills.toString(), inline: true },
           {
             name: "Total Headshot Kills",
             value: headshotKills.toString(),
@@ -163,6 +183,47 @@ client.on(Events.InteractionCreate, async (interaction) => {
         errorMessage = e.message;
       }
       await interaction.editReply(`Error: ${errorMessage}`);
+    }
+  } else if (interaction.commandName === "weapons") {
+    await interaction.deferReply();
+    const userInput = interaction.options.getString("steamid");
+
+    try {
+      const steamID64 = await getSteamID64(userInput);
+      const [summary, stats] = await Promise.all([
+        getPlayerSummary(steamID64),
+        getPlayerStats(steamID64),
+      ]);
+
+      const topWeapons = processWeaponStats(stats);
+
+      const embed = new EmbedBuilder()
+        .setColor(0xffa500)
+        .setTitle(`CS2 Favorite Weapons: ${summary.personaname}`)
+        .setURL(summary.profileurl)
+        .setThumbnail(summary.avatarfull)
+        .setDescription("5 highest kills and accuracy for each weapon.")
+        .setTimestamp();
+
+      if (topWeapons.length > 0) {
+        topWeapons.forEach((weapon) => {
+          embed.addFields({
+            name: `🔫 ${weapon.name}`,
+            value: `**Kills:** ${weapon.kills}\n**Accuracy:** ${weapon.accuracy}%`,
+            inline: true,
+          });
+        });
+      } else {
+        embed.setDescription("notfound");
+      }
+
+      await interaction.editReply({ embeds: [embed] });
+    } catch (error) {
+      console.error(error);
+      await interaction.editReply({
+        content: `Error: ${error.message}`,
+        ephemeral: true,
+      });
     }
   }
 });
