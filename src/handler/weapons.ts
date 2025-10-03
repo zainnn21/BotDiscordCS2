@@ -27,6 +27,7 @@ const weapons = async (interaction: ChatInputCommandInteraction) => {
       .setURL(summary.profileurl)
       .setThumbnail(summary.avatarfull)
       .setDescription("5 highest kills and accuracy for each weapon.")
+      .setFooter({ text: `SteamID: ${steamID64}` })
       .setTimestamp();
 
     if (topWeapons.length > 0) {
