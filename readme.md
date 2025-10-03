@@ -43,7 +43,7 @@ Follow these instructions to get a local copy of the bot up and running for deve
 2.  **Install NPM packages:**
 
     ```sh
-    npm install
+    bun install
     ```
 
 3.  **Create and configure your environment file:**
@@ -58,7 +58,7 @@ Follow these instructions to get a local copy of the bot up and running for deve
 
 4.  **Run the bot:**
     ```sh
-    node index.js
+    bun dev
     ```
     Your bot should now be online and its slash commands registered!
 
