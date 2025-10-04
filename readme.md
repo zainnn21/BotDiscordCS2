@@ -46,7 +46,7 @@ Follow these instructions to get a local copy of the bot up and running for deve
 1.  **Clone the repository:**
 
     ```sh
-    git clone [https://github.com/your-username/cs2-stats-bot.git](https://github.com/your-username/cs2-stats-bot.git)
+    git clone https://github.com/zainnn21/BotDiscordCS2.git
     cd cs2-stats-bot
     ```
 
